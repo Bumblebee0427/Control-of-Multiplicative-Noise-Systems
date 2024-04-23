@@ -39,8 +39,8 @@ class MultiplicativeGaussianNoiseEnvironment(Environment):
         A_t: Tensor = self.a + self.alpha * torch.randn(size=())
         B_t: Tensor = self.b + self.beta * torch.randn(size=())
         C_t: Tensor = self.c + self.gamma * torch.randn(size=())
-        self.x: Tensor = ... # TODO
-        self.y: Tensor = ... # TODO
+        self.y: Tensor = C_t * self.x  # TODO
+        self.x: Tensor = A_t * self.x + B_t * u # TODO
 
     def loss(self, u: Tensor) -> Tensor:
         """
@@ -52,10 +52,10 @@ class MultiplicativeGaussianNoiseEnvironment(Environment):
         """
         Resets the state and observation to their initial distributions.
         """
-        self.x: Tensor = ... # TODO
+        self.x: Tensor = self.mu + self.sigma * torch.randn(size=()) # TODO
 
-        C_0: Tensor = ... #TODO
-        self.y: Tensor = ... # TODO
+        C_0: Tensor = self.c + self.gamma * torch.randn(size=()) #TODO
+        self.y: Tensor = C_0 * self.x # TODO
 
 
 class MultiplicativeGaussianControlNoiseEnvironment(MultiplicativeGaussianNoiseEnvironment):
