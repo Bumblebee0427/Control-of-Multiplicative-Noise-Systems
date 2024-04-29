@@ -40,7 +40,7 @@ for PolicyClass in [LinearMemory1Period1, AffineMemory2Period1, AffineMemory1Per
             policy = PolicyClass(theta_0=b, theta_1=1, theta_2=b)  # Initialize theta_0, theta_1, theta_2
         else:  # AffineMemory1Period2
             policy = PolicyClass(theta_0=b, theta_1=1, theta_2=b, theta_3=1)  # Initialize theta_0, theta_1, theta_2, theta_3
-        env = MultiplicativeGaussianNoiseEnvironment(b=b, beta=beta)
+        env = MultiplicativeGaussianControlNoiseEnvironment(a= alpha, b=b, beta=beta, lmbda = 0)
         U = LearnableWeightM1P1LinearModule()
         U_optim = torch.optim.Adam(U.parameters(), lr=lr)  # Why are we using Adam instead of SGD? See below
         # policy = AdditiveGaussianNoiseStochasticPolicy(U, U_optim, omega)
@@ -76,7 +76,7 @@ for PolicyClass in [LinearMemory1Period1, AffineMemory2Period1, AffineMemory1Per
             policy = PolicyClass(theta_0=c, theta_1=1, theta_2=c)  # Initialize theta_0, theta_1, theta_2
         else:  # AffineMemory1Period2
             policy = PolicyClass(theta_0=c, theta_1=1, theta_2=c, theta_3=1)  # Initialize theta_0, theta_1, theta_2, theta_3
-        env = MultiplicativeGaussianNoiseEnvironment(c=c, gamma=gamma)
+        env = MultiplicativeGaussianObservationNoiseEnvironment(a=alpha, c=c, gamma=gamma, lmbda = 0)
         U = LearnableWeightM1P1LinearModule()
         U_optim = torch.optim.Adam(U.parameters(), lr=lr)  # Why are we using Adam instead of SGD? See below
         # policy = AdditiveGaussianNoiseStochasticPolicy(U, U_optim, omega)
