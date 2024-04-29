@@ -83,4 +83,4 @@ class AffineMemory1Period2(nn.Module):
         else:  # t is odd
             return self.theta_2 + self.theta_3 * y_t
 
-__all__ = ["FixedWeightM1P1LinearModule", "LearnableWeightM1P1LinearModule"]
+__all__ = ["FixedWeightM1P1LinearModule", "LearnableWeightM1P1LinearModule", "LinearMemory1Period1","AffineMemory2Period1","AffineMemory1Period2"]

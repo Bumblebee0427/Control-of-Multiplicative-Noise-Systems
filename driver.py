@@ -6,6 +6,8 @@ from policies.additive_gaussian_policy import *
 from policies.m1p1_linear_policy_modules import *
 from agent import *
 from control_engine import *
+import numpy as np
+import matplotlib.pyplot as plt
 
 M = 100
 N_train = 1000
@@ -23,16 +25,74 @@ sigma = 0.0
 lmbda = 0.0
 omega = 1.0
 lr = 1e-1
+# Problem 6b
+alpha_values = np.linspace(start=0.1, stop=2.0, num=20)
+performance_metrics = {
+    'LinearMemory1Period1': [],
+    'AffineMemory2Period1': [],
+    'AffineMemory1Period2': [],
+}
+for PolicyClass in [LinearMemory1Period1, AffineMemory2Period1, AffineMemory1Period2]:
+    for alpha in alpha_values:
+        if PolicyClass is LinearMemory1Period1:
+            policy = PolicyClass(theta_0=b)  # Set initial theta_0 to b
+        elif PolicyClass is AffineMemory2Period1:
+            policy = PolicyClass(theta_0=b, theta_1=1, theta_2=b)  # Initialize theta_0, theta_1, theta_2
+        else:  # AffineMemory1Period2
+            policy = PolicyClass(theta_0=b, theta_1=1, theta_2=b, theta_3=1)  # Initialize theta_0, theta_1, theta_2, theta_3
+        env = MultiplicativeGaussianNoiseEnvironment(b=b, beta=beta)
+        U = LearnableWeightM1P1LinearModule()
+        U_optim = torch.optim.Adam(U.parameters(), lr=lr)  # Why are we using Adam instead of SGD? See below
+        # policy = AdditiveGaussianNoiseStochasticPolicy(U, U_optim, omega)
+        agent = PolicyGradientAgent(policy)
+        engine = ControlEngine(agent, env)
+        engine.train_agent(M, N_train, T_train)
+        metric = engine.evaluate_agent(N_eval, T_eval)
+        performance_metrics.append(metric)
+    
+# Plot the performance metric against alpha values
+plt.plot(alpha_values, performance_metrics, marker='o')
+plt.xlabel('Alpha')
+plt.ylabel('Performance Metric')
+plt.title('Problem b : Performance Metric vs Alpha')
+plt.grid(True)
+plt.show()
 
-env = MultiplicativeGaussianNoiseEnvironment(a, b, c, mu, alpha, beta, gamma, sigma, lmbda)
-U = LearnableWeightM1P1LinearModule()
-U_optim = torch.optim.Adam(U.parameters(), lr=lr)  # Why are we using Adam instead of SGD? See below
-policy = AdditiveGaussianNoiseStochasticPolicy(U, U_optim, omega)
-agent = PolicyGradientAgent(policy)
-engine = ControlEngine(agent, env)
-engine.train_agent(M, N_train, T_train)
-engine.evaluate_agent(N_eval, T_eval)
+# Problem 6c
+c = 1.0
+gamma = 1.0
 
+alpha_values = np.linspace(start=0.1, stop=2.0, num=20)
+performance_metrics = {
+    'LinearMemory1Period1': [],
+    'AffineMemory2Period1': [],
+    'AffineMemory1Period2': [],
+}
+for PolicyClass in [LinearMemory1Period1, AffineMemory2Period1, AffineMemory1Period2]:
+    for alpha in alpha_values:
+        if PolicyClass is LinearMemory1Period1:
+            policy = PolicyClass(theta_0=c)  # Set initial theta_0 to b
+        elif PolicyClass is AffineMemory2Period1:
+            policy = PolicyClass(theta_0=c, theta_1=1, theta_2=c)  # Initialize theta_0, theta_1, theta_2
+        else:  # AffineMemory1Period2
+            policy = PolicyClass(theta_0=c, theta_1=1, theta_2=c, theta_3=1)  # Initialize theta_0, theta_1, theta_2, theta_3
+        env = MultiplicativeGaussianNoiseEnvironment(c=c, gamma=gamma)
+        U = LearnableWeightM1P1LinearModule()
+        U_optim = torch.optim.Adam(U.parameters(), lr=lr)  # Why are we using Adam instead of SGD? See below
+        # policy = AdditiveGaussianNoiseStochasticPolicy(U, U_optim, omega)
+        agent = PolicyGradientAgent(policy)
+        engine = ControlEngine(agent, env)
+        engine.train_agent(M, N_train, T_train)
+        metric = engine.evaluate_agent(N_eval, T_eval)
+        performance_metrics.append(metric)
+        
+# Plot the performance metric against alpha values
+plt.plot(alpha_values, performance_metrics, marker='o')
+plt.xlabel('Alpha')
+plt.ylabel('Performance Metric')
+plt.title('Problem c : Performance Metric vs Alpha')
+plt.grid(True)
+plt.show()
 """
 Debugging tip: if your trajectory diverges, first re-run a few times -- especially on the "edge of stability", 
 you may have had bad draws of random noise that screwed up your gradients. If this doesn't help,
