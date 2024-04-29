@@ -71,7 +71,7 @@ performance_metrics = {
 for PolicyClass in [LinearMemory1Period1, AffineMemory2Period1, AffineMemory1Period2]:
     for alpha in alpha_values:
         if PolicyClass is LinearMemory1Period1:
-            policy = PolicyClass(theta_0=c)  # Set initial theta_0 to b
+            policy = PolicyClass(theta_0=c)  
         elif PolicyClass is AffineMemory2Period1:
             policy = PolicyClass(theta_0=c, theta_1=1, theta_2=c)  # Initialize theta_0, theta_1, theta_2
         else:  # AffineMemory1Period2
